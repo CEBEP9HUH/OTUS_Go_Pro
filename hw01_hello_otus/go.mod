@@ -1,4 +1,4 @@
-module github.com/CEBEP9HUH/OTUS_Go_Pro/tree/master/hw01_hello_otus
+module github.com/CEBEP9HUH/OTUS_Go_Pro/hw01_hello_otus
 
 go 1.19
 
