@@ -1,4 +1,4 @@
-module github.com/CEBEP9HUH/hw03_frequency_analysis
+module github.com/CEBEP9HUH/OTUS_Go_Pro/hw01_hello_otus
 
 go 1.19
 
