@@ -1,9 +1,12 @@
 package hw03frequencyanalysis
 
 import (
+	"regexp"
 	"sort"
 	"strings"
 )
+
+var lowerCaseWords = regexp.MustCompile(`[а-яa-z]+\-*[а-яa-z]+|[а-яa-z]+|\-{2,}`)
 
 func min(a, b int) int {
 	if a < b {
@@ -18,7 +21,8 @@ func Top10(s string) []string {
 		pos   int
 	}
 
-	words := strings.Fields(s)
+	words := lowerCaseWords.FindAllString(strings.ToLower(s), -1)
+
 	freq := make(map[string]counter)
 	for i, v := range words {
 		freq[v] = counter{
