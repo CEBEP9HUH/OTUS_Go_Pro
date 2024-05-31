@@ -48,15 +48,9 @@ func TestCache(t *testing.T) {
 		require.False(t, ok)
 		require.Nil(t, val)
 	})
-
-	t.Run("purge logic", func(t *testing.T) {
-		// Write me
-	})
 }
 
-func TestCacheMultithreading(t *testing.T) {
-	t.Skip() // Remove me if task with asterisk completed.
-
+func TestCacheMultithreading(_ *testing.T) {
 	c := NewCache(10)
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
@@ -76,4 +70,47 @@ func TestCacheMultithreading(t *testing.T) {
 	}()
 
 	wg.Wait()
+}
+
+func TestFixedCacheSize(t *testing.T) {
+	vals := []int{1, 2, 3, 4}
+	c := NewCache(len(vals) - 1)
+	for _, v := range vals {
+		c.Set(Key(strconv.Itoa(v)), v)
+	}
+
+	for _, v := range vals[1:] {
+		_, ok := c.Get(Key(strconv.Itoa(v)))
+		require.True(t, ok, "Expect true for %d", v)
+	}
+	_, ok := c.Get(Key(strconv.Itoa(vals[0])))
+	require.False(t, ok, "Expect false for %d", vals[0])
+}
+
+func TestLRU(t *testing.T) {
+	vals := []int{1, 2, 3}
+	additionalValue := 4
+	droppedValue := 2
+	access := []int{1, 2, 3, 1, 1, 3, 3, 1}
+	c := NewCache(len(vals))
+	for _, v := range vals {
+		c.Set(Key(strconv.Itoa(v)), v)
+	}
+
+	for _, v := range access {
+		c.Get(Key(strconv.Itoa(v)))
+	}
+
+	c.Set(Key(strconv.Itoa(additionalValue)), additionalValue)
+	vals = append(vals, additionalValue)
+
+	for _, v := range vals {
+		if v == droppedValue {
+			_, ok := c.Get(Key(strconv.Itoa(v)))
+			require.False(t, ok, "Expect false for %d", v)
+			continue
+		}
+		_, ok := c.Get(Key(strconv.Itoa(v)))
+		require.True(t, ok, "Expect true for %d", v)
+	}
 }
